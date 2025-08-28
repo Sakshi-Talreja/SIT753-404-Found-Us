@@ -3,11 +3,14 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search, Menu, X, User, GraduationCap, Users } from "lucide-react"
+import { Menu, X, User, GraduationCap, Users } from "lucide-react"
+import { AuthNav } from "@/components/auth-nav"
+import { SearchInput } from "@/components/search-input"
+import { useAuth } from "@/contexts/auth-context"
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user } = useAuth()
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
@@ -37,20 +40,27 @@ export function Navigation() {
             </Link>
           </div>
 
-          {/* Search and Portal Buttons */}
+          {/* Search and Auth */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input type="search" placeholder="Search..." className="pl-10 w-64" />
-            </div>
-            <Button variant="outline" size="sm">
-              <User className="h-4 w-4 mr-2" />
-              Student Portal
-            </Button>
-            <Button variant="outline" size="sm">
-              <Users className="h-4 w-4 mr-2" />
-              Staff Portal
-            </Button>
+            <SearchInput placeholder="Search..." className="w-64" />
+            {user ? (
+              <AuthNav />
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">
+                    <User className="h-4 w-4 mr-2" />
+                    Student Portal
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">
+                    <Users className="h-4 w-4 mr-2" />
+                    Staff Portal
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -78,15 +88,32 @@ export function Navigation() {
                 Contact
               </Link>
               <div className="pt-4 space-y-2">
-                <Input type="search" placeholder="Search..." className="w-full" />
-                <Button variant="outline" size="sm" className="w-full justify-start bg-transparent">
-                  <User className="h-4 w-4 mr-2" />
-                  Student Portal
-                </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start bg-transparent">
-                  <Users className="h-4 w-4 mr-2" />
-                  Staff Portal
-                </Button>
+                <SearchInput placeholder="Search..." className="w-full" />
+                {user ? (
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start bg-transparent" asChild>
+                      <Link href={user.userType === "student" ? "/student-portal" : "/staff-portal"}>
+                        <User className="h-4 w-4 mr-2" />
+                        My Portal
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm" className="w-full justify-start bg-transparent" asChild>
+                      <Link href="/login">
+                        <User className="h-4 w-4 mr-2" />
+                        Student Portal
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start bg-transparent" asChild>
+                      <Link href="/login">
+                        <Users className="h-4 w-4 mr-2" />
+                        Staff Portal
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
